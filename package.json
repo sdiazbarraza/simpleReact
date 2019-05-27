@@ -1,0 +1,17 @@
+{
+  "name": "fullstatck_app",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "start": "concurrently \"cd backend && node server.js\" \"cd clientv2 && npm start\""
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "bootstrap": "^4.3.1",
+    "concurrently": "^4.1.0"
+  },
+  "devDependencies": {},
+  "description": ""
+}
