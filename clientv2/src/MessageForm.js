@@ -12,7 +12,7 @@ class MessageForm extends Component {
     super(props);
     
   }
-  state = { isShow: false };
+  state = { isShow: false};
 
 
 
@@ -20,8 +20,15 @@ class MessageForm extends Component {
    // console.log("change "+event.target.value);
     //this.setState({value: event.target.value});
   }
-
-  renderFields() {
+  componentDidMount() {
+    // Con este prop controlamos si vamos a usar el componente para crear o para actualizar.
+    if(this.props.type == 'update') {
+        const elements = document.querySelectorAll('.inputTex')
+        elements[0].value= this.props.message.message;
+    }
+}
+  
+renderFields() {
     if(this.state.isShow){
         console.log("wena");
         return ;
@@ -35,18 +42,21 @@ class MessageForm extends Component {
           type="text"
           label={label}
           name={name}/>
-
       );
     });
-
   }
 
   onSubmit(event) {
     event.preventDefault();
-    const {formValues,submitMessage} = this.props;
-    console.log("IN ONSUBMIT");
-    console.log(formValues.messageForm.values);
-    submitMessage(formValues.messageForm.values);
+    const {formValues,submitMessage,updateMessage} = this.props;
+    if(this.props.type=="update"){
+      formValues.messageForm.values._id=this.props.message._id;
+      updateMessage(formValues.messageForm.values);
+    }else{
+      submitMessage(formValues.messageForm.values);
+    }
+    
+    
   }
   handleSubmit(message){
     console.log("handle_message"+message);
@@ -80,13 +90,12 @@ function validate(values) {
   return errors;
 }
 function mapStateToProps(state) {
+  
   return { formValues: state.form }
   //return { formValues: state.form.messageForm.values };
 }
 MessageForm=reduxForm({
-  //validate,
   form: 'messageForm'
-  //destroyOnUnmount: false
 })(MessageForm);
 
 export default connect(mapStateToProps, actions)(withRouter(MessageForm));

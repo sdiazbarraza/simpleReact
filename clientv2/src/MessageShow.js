@@ -1,10 +1,10 @@
 import React, { Component } from 'react';
-import axios from "axios";
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { reduxForm } from 'redux-form';
 import MessageForm from './MessageForm';
 import { connect } from 'react-redux';
 import { withRouter } from 'react-router-dom';
+import memoize from 'memoize-one';
 import * as actions from './actions';
 class MessageShow extends Component {
     constructor(props) {
@@ -12,55 +12,42 @@ class MessageShow extends Component {
         //const store = props.store
         // grab our starting state
         //this.state = store.getState();
-        console.log("WEBA");
-        console.log(props);
         // subscribe to our store
         /*
         store.fetchMessage(this.props.match.params.id).then(function(meess){
             console.log("WEBA");
             this.setState(message.getState())
         });*/
+        this.state = {
+          isShow: true,
+          executeApi: false,
+          message: {}
+        };
       }
-    componentDidMount() {
-
+   componentDidMount(){
+   this.setState({executeApi:true,message: this.props.fetchMessage(this.props.match.params.id)});
+   } 
+    componentWillUnmount() {
+      if (this._asyncRequest) {
         let id =this.props.match.params.id;
-        if(typeof id !="undefined" && id!="" ){
-            this.props.fetchMessage(id);
-          
-          
-        }
-        
+        this.props.fetchMessage(id).cancel();
+      }
     }
-    /*
-    componentWillReceiveProps(nextProps){
-        console.log("nextProps");    
-        console.log(nextProps);
-      }*/
-      static getDerivedStateFromProps(nextProps, prevState) {
-        // do things with nextProps.someProp and prevState.cachedSomeProp
-        console.log("nextProps");
-        console.log(nextProps);
-        /*
-        return {
-          cachedSomeProp: nextProps.someProp,
-       
-        };*/
-      }  
-
-      renderContent() {
+    renderContent() {
         return (
           <MessageForm
-            onMessageSubmit={() => this.setState({ showFormReview: true })}
+            type="update"
+            message={this.props.message.message}
           />
         );
       }
-
+      getDerivedData = memoize(()=>this.state.message
+        );
       render() {
-        console.log("render");  
-        console.log(this.state);
+        const messageProps = this.getDerivedData(this.props.message);
         return (
           <div>
-            {this.renderContent()}
+            {Object.entries(messageProps).length === 0 && messageProps.constructor === Object ?<p>Loading ...</p>:this.renderContent()}
           </div>
         );
       }

@@ -40,10 +40,10 @@ router.get('/message/:id',async(req, res) => {
 
 
 router.post("/updateData", (req, res) => {
-  const { id, update } = req.body;
-  Data.findByIdAndUpdate(id, update, err => {
+  const { _id} = req.body;
+  Data.findByIdAndUpdate(_id, {$set:req.body}, function(err,ressult) {
     if (err) return res.json({ success: false, error: err });
-    return res.json({ success: true });
+    return res.send(ressult);
   });
 });
 
